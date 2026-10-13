@@ -2,7 +2,7 @@
 
 > **Predict. Optimize. Improve.**  
 > *Decision Intelligence & Explainable Student Success Platform for Higher Education*  
-> **Production Live URL:** `https://ascendiq-d4oopg9lv-naksha5.vercel.app`
+> **Production Live URL:** `https://ascendiq-naksha5.vercel.app`
 
 ---
 
@@ -160,7 +160,7 @@ ASCENDIQ adheres strictly to ethical, transparent data science:
 
 ## 6. Production Environment Variables Reference
 
-For the live Vercel deployment at `https://ascendiq-d4oopg9lv-naksha5.vercel.app`, set the following environment variables in your Vercel Project Settings:
+For the live Vercel deployment at `https://ascendiq-naksha5.vercel.app`, set the following environment variables in your Vercel Project Settings:
 
 | Environment Variable Key | Exact Production Value | Target Environment |
 |---|---|---|
