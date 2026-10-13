@@ -665,6 +665,7 @@ class ApplicationPayload(BaseModel):
 
 class ActionPlanTaskPayload(BaseModel):
     student_id: str
+    id: Optional[str] = None
     title: str
     explanation: str
     priority: str = "Medium"
@@ -931,7 +932,7 @@ def add_action_plan_task(student_id: str, payload: ActionPlanTaskPayload):
     if student_id not in _ACTION_PLANS_STORE:
         _ACTION_PLANS_STORE[student_id] = generate_default_career_action_plan(student_id)
 
-    task_id = f"cap-{uuid.uuid4().hex[:8]}"
+    task_id = payload.id or f"cap-{uuid.uuid4().hex[:8]}"
     record = {
         "id": task_id,
         "title": payload.title,

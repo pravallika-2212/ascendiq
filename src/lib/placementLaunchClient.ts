@@ -1375,11 +1375,17 @@ export const placementLaunchService = {
     }
 
     try {
-      await fetch(`http://127.0.0.1:8000/api/career-launch/action-plan/${encodeURIComponent(studentId)}/task`, {
+      const res = await fetch(`http://127.0.0.1:8000/api/career-launch/action-plan/${encodeURIComponent(studentId)}/task`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(record)
       })
+      if (res.ok) {
+        const saved = await res.json()
+        const current = getLocalOrMemory<CareerActionPlanTask>('action_plans', memoryActionPlans, studentId)
+        saveLocalOrMemory('action_plans', memoryActionPlans, studentId, [saved, ...current])
+        return saved
+      }
     } catch {
       // ignore
     }
