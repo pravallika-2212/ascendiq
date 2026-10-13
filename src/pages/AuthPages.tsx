@@ -192,6 +192,7 @@ export default function AuthPage({ type }: { type: AuthPageType }) {
         window.setTimeout(() => go('/login'), 1200)
       }
     } catch (cause) {
+      console.error('[Auth submission error]', cause)
       setError(readableAuthError(cause instanceof Error ? cause.message : 'request failed'))
     } finally { setBusy(false) }
   }

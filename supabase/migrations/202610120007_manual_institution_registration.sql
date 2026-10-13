@@ -163,14 +163,29 @@ begin
     ) values (
       new.id, institution_name, program_name, department_name,
       admission, study_year, roll
-    );
+    )
+    on conflict (user_id) do update set
+      institution_name = excluded.institution_name,
+      program_name = excluded.program_name,
+      department_name = excluded.department_name,
+      admission_year = excluded.admission_year,
+      current_study_year = excluded.current_study_year,
+      roll_number = excluded.roll_number,
+      submitted_at = now();
+
     insert into public.profiles (
       id, full_name, institution_id, course_id, department_id, academic_year,
       admission_year, student_id, roll_number, privacy_consent_at, account_status
     ) values (
       new.id, btrim(meta->>'full_name'), null, null, null, study_year,
       admission, roll, roll, now(), 'pending'
-    );
+    )
+    on conflict (id) do update set
+      full_name = excluded.full_name,
+      academic_year = excluded.academic_year,
+      admission_year = excluded.admission_year,
+      student_id = excluded.student_id,
+      roll_number = excluded.roll_number;
   end if;
 
   -- Student details are not retained in auth metadata/JWT claims.
@@ -236,7 +251,8 @@ create trigger profiles_validate_catalog before insert or update of
   institution_id, course_id, department_id, academic_year, admission_year, roll_number
   on public.profiles for each row execute function public.validate_student_profile_catalog();
 
--- Ensure the signup trigger is active on auth.users
+-- Ensure both previous and current trigger names are cleanly removed before recreating
+drop trigger if exists on_auth_user_created_student_profile on auth.users;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
