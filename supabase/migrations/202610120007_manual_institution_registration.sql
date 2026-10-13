@@ -2,6 +2,13 @@
 -- trusted institution or catalog row. Apply after migrations 001-006.
 begin;
 
+-- Ensure profile columns exist before altering constraints
+alter table public.profiles add column if not exists roll_number text;
+alter table public.profiles add column if not exists admission_year smallint;
+alter table public.profiles add column if not exists academic_year smallint;
+alter table public.profiles add column if not exists account_status text default 'pending';
+alter table public.profiles add column if not exists privacy_consent_at timestamptz default now();
+
 -- A profile can exist while its institution/program are awaiting trusted
 -- catalog matching. Existing linked profiles and their foreign keys remain.
 alter table public.profiles alter column institution_id drop not null;
@@ -228,5 +235,14 @@ drop trigger if exists profiles_validate_catalog on public.profiles;
 create trigger profiles_validate_catalog before insert or update of
   institution_id, course_id, department_id, academic_year, admission_year, roll_number
   on public.profiles for each row execute function public.validate_student_profile_catalog();
+
+-- Ensure the signup trigger is active on auth.users
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_student_signup();
+
+-- Instruct PostgREST to immediately refresh its schema cache
+notify pgrst, 'reload schema';
 
 commit;
